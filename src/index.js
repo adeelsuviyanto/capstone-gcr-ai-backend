@@ -8,6 +8,10 @@ const port = 8080;
 
 //Google API initialization
 const {google} = require('googleapis');
+const credentials = require('..capstone-project-c22-ps362-c0bce78a39b5.json')
+
+//Private initialization
+const userAuth = require('./userauth');
 
 //Firebase configuration and initialization
 const firebaseConfig = {
@@ -21,3 +25,11 @@ const firebaseConfig = {
   };
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+
+//Initialize Express HTTPS server
+web.use(express.json());
+web.use(express.urlencoded({extended: true}));
+const PORT = process.env.PORT || 8080;
+web.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}.`);
+});

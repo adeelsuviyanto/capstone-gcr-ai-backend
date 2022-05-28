@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/aiplatform": "^1.19.0",
     "@google-cloud/functions-framework": "^3.1.1",
     "firebase": "^9.8.1",
     "googleapis": "^100.0.0"

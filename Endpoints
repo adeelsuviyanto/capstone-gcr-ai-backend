@@ -1,0 +1,27 @@
+Endpoints:
+
+POST /registerdoc ## User registration
+	Payload: email, password
+	Response: Firebase sign up response
+	
+POST /login ## User login
+	Payload: email, password
+	Response: Firebase REST auth response (Auth token, email)
+	
+POST /imageupload ## prediction image upload
+	Payload: data:image/jpeg, Auth token
+	Response: HTTP status code, imageurl(?)
+	Upload image to Cloud Storage to be used for AI Platform for prediction
+
+GET /predict ## prediction request
+	Payload: data:json, Auth token, imageurl(?)
+	Response: AI Platform prediction result (JSON)
+	Create prediction requests for authorized users
+	
+POST /registerpatient ## patient registration
+	Payload: data:json, Auth token
+	Response: HTTP status code
+	
+GET /patientlist ## patient list
+	Payload: Auth token
+	Response: JSON
