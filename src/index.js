@@ -23,8 +23,8 @@ const firebaseConfig = {
     appId: "1:478835089859:web:d08e256e3ba1ecf9379d76",
     measurementId: "G-7FY8K67PFY"
   };
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+//const app = initializeApp(firebaseConfig);
+//const analytics = getAnalytics(app);
 
 //Initialize Express HTTPS server
 web.use(express.json());
