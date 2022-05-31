@@ -1,5 +1,5 @@
-import {initializeApp} from 'firebase/app'
-import {getAnalytics} from 'firebase/analytics'
+//import {initializeApp} from 'firebase/app'
+//import {getAnalytics} from 'firebase/analytics'
 
 //Express configuration: HTTP backend service
 const express = require('express');
@@ -11,7 +11,7 @@ const {google} = require('googleapis');
 const credentials = require('..capstone-project-c22-ps362-c0bce78a39b5.json')
 
 //Private initialization
-const userAuth = require('./userauth');
+//const userAuth = require('./userauth');
 
 //Firebase configuration and initialization
 const firebaseConfig = {
@@ -30,6 +30,13 @@ const analytics = getAnalytics(app);
 web.use(express.json());
 web.use(express.urlencoded({extended: true}));
 const PORT = process.env.PORT || 8080;
+
+//Endpoints
+web.get('/', (req, res) => {
+  res.send('Backend configured.')
+})
+
+
 web.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
