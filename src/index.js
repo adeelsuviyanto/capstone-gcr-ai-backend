@@ -9,6 +9,7 @@ const port = 8080;
 //Google API initialization
 const {google} = require('googleapis');
 //const credentials = require('..capstone-project-c22-ps362-c0bce78a39b5.json')
+const credentials = require('/secrets/predictor_service_account.json')
 
 //Private initialization
 //const userAuth = require('./userauth');
