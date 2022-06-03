@@ -1,0 +1,21 @@
+Database: patients_database
+Tables: patients, predictions
+
+patients :
+	columns:
+		patientid (INT) AUTO_INCREMENT
+		name (VARCHAR)
+		sex (CHAR)
+		dateofbirth (DATE YYYY-MM-DD) 
+		address (VARCHAR)
+	note: when using INSERT INTO, make sure to specify columns to be inserted
+			INSERT INTO patients (name, sex, dateofbirth, address) VALUES ('test3', 'F', '1990-11-22', 'Bintaro Boulevard, Tangerang Selatan, Banten, Indonesia');
+			
+predictions:
+	columns:
+		predictionid AUTO_INCREMENT
+		patientid INT
+		image (VARCHAR URL)
+		predictionresult (float)
+		predictiontimestamp (UNIX timestamp)
+	note: when using INSERT INTO, specify columns (patientid, image, predictionresult, predictiontimestamp)

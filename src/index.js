@@ -9,7 +9,22 @@ const port = 8080;
 //Google API initialization
 const {google} = require('googleapis');
 //const credentials = require('..capstone-project-c22-ps362-c0bce78a39b5.json')
-const credentials = require('/secrets/predictor_service_account.json')
+//const credentials = require('/secrets/predictor_service_account.json')
+const {SecretManagerServiceClient} = require('@google-cloud/secret-manager');
+const { Client } = require('@grpc/grpc-js');
+
+//Secrets
+secretClient = new SecretManagerServiceClient();
+async function accessSecretVersion(name) {
+  const [version] = await secretClient({
+    name: name
+  })
+  return version.payload.data;
+}
+const sql_user = accessSecretVersion(process.env.db_user);
+const sql_pass = accessSecretVersion(process.env.db_password);
+const sql_db_name = accessSecretVersion(process.env.db_name);
+const sql_connection = accessSecretVersion(process.env.db_connection);
 
 //Private initialization
 //const userAuth = require('./userauth');
@@ -35,6 +50,10 @@ const PORT = process.env.PORT || 8080;
 //Endpoints
 web.get('/', (req, res) => {
   res.send('Backend configured.')
+});
+
+web.post('/registerpatient', (req, res) => {
+  res.send('Placeholder');
 })
 
 
