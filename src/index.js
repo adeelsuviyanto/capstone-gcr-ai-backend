@@ -14,9 +14,9 @@ const {SecretManagerServiceClient} = require('@google-cloud/secret-manager');
 const { Client } = require('@grpc/grpc-js');
 
 //Secrets
-const secretClient = new SecretManagerServiceClient();
-async function accessSecretVersion(name) {
-  const [version] = await secretClient({
+//const client = new SecretManagerServiceClient();
+/*async function accessSecretVersion(name) {
+  const [version] = await client({
     name: name
   })
   return version.payload.data;
@@ -25,6 +25,27 @@ const sql_user = accessSecretVersion(process.env.db_user);
 const sql_pass = accessSecretVersion(process.env.db_password);
 const sql_db_name = accessSecretVersion(process.env.db_name);
 const sql_connection = accessSecretVersion(process.env.db_connection);
+*/
+
+//Placeholder credentials for Cloud SQL
+const sql_user = 'doctors';
+const sql_password = '12345678';
+const sql_db_name = 'patient-data';
+const sql_connection = 'capstone-project-c22-ps362:asia-southeast2:patient-data';
+
+//Cloud SQL initialization
+//Create UNIX socket
+const createUnixSocketPool = async config => {
+  const dbSocketPath = process.env.DB_SOCKET_PATH || '/cloudsql';
+
+  //Establish connection to Cloud SQL
+  return mysql.createPool({
+    user: sql_user,
+    password: sql_password,
+    database: sql_db_name,
+    socketPath: `${dbSocketPath}/capstone-project-c22-ps362:asia-southeast2:patient-data`,
+  });
+};
 
 //Private initialization
 //const userAuth = require('./userauth');
