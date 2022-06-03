@@ -58,8 +58,8 @@ const createPool = async() => {
     waitForConnections: true,
     queueLimit: 0,
   };
+  createUnixSocketPool(config);
 };
-createUnixSocketPool(config);
 
 
 //Endpoints
