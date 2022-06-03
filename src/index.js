@@ -12,6 +12,7 @@ const {google} = require('googleapis');
 //const credentials = require('/secrets/predictor_service_account.json')
 const {SecretManagerServiceClient} = require('@google-cloud/secret-manager');
 const { Client } = require('@grpc/grpc-js');
+const createUnixSocketPool = require('./unix-socket.js');
 
 //Secrets
 //const client = new SecretManagerServiceClient();
@@ -26,26 +27,6 @@ const sql_pass = accessSecretVersion(process.env.db_password);
 const sql_db_name = accessSecretVersion(process.env.db_name);
 const sql_connection = accessSecretVersion(process.env.db_connection);
 */
-
-//Placeholder credentials for Cloud SQL
-const sql_user = 'doctors';
-const sql_password = '12345678';
-const sql_db_name = 'patient-data';
-const sql_connection = 'capstone-project-c22-ps362:asia-southeast2:patient-data';
-
-//Cloud SQL initialization
-//Create UNIX socket
-const createUnixSocketPool = async config => {
-  const dbSocketPath = process.env.DB_SOCKET_PATH || '/cloudsql';
-
-  //Establish connection to Cloud SQL
-  return mysql.createPool({
-    user: sql_user,
-    password: sql_password,
-    database: sql_db_name,
-    socketPath: `${dbSocketPath}/capstone-project-c22-ps362:asia-southeast2:patient-data`,
-  });
-};
 
 //Private initialization
 //const userAuth = require('./userauth');
@@ -67,6 +48,19 @@ const firebaseConfig = {
 web.use(express.json());
 web.use(express.urlencoded({extended: true}));
 const PORT = process.env.PORT || 8080;
+
+//Cloud SQL: Create pool
+const createPool = async() => {
+  const config = {
+    connectionLimit: 5,
+    connectionTimeout: 10000,
+    acquireTimeout: 10000,
+    waitForConnections: true,
+    queueLimit: 0,
+  };
+};
+createUnixSocketPool(config);
+
 
 //Endpoints
 web.get('/', (req, res) => {
