@@ -14,7 +14,7 @@ const {SecretManagerServiceClient} = require('@google-cloud/secret-manager');
 const { Client } = require('@grpc/grpc-js');
 
 //Secrets
-secretClient = new SecretManagerServiceClient();
+const secretClient = new SecretManagerServiceClient();
 async function accessSecretVersion(name) {
   const [version] = await secretClient({
     name: name
