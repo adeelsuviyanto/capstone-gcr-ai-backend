@@ -54,6 +54,7 @@ const createPoolAndEnsureSchema = async () =>
     });
 let pool;
 
+//Creating UDP Socket Pool and ensuring table schema
 web.use(async (req, res, next) => {
   if(pool){
     return next();
@@ -68,6 +69,9 @@ web.use(async (req, res, next) => {
   }
 })
 
+//Making sure Express is able to parse JSON request bodies
+web.use(express.json());
+
 //Endpoints
 web.get('/', (req, res) => {
   res.send('Backend configured.')
@@ -75,7 +79,7 @@ web.get('/', (req, res) => {
 
 web.post('/registerpatient', async (req, res) => {
   //Parse JSON-based request body
-  const patientData = JSON.parse(req.body);
+  const patientData = res.json(req.body);
   console.log(patientData);
   //If request body is empty then respond with 400 code
   if(!patientData){
