@@ -49,7 +49,6 @@ const createPoolAndEnsureSchema = async () =>
       return pool;
     })
     .catch(err => {
-      logger.error(err);
       throw err;
     });
 let pool;
@@ -64,7 +63,6 @@ web.use(async (req, res, next) => {
     next();
   }
   catch(err){
-    logger.error(err);
     return next(err);
   }
 })
@@ -91,7 +89,6 @@ web.post('/registerpatient', async (req, res) => {
     await pool.query(stmt, [patientData.name, patientData.sex, patientData.dateofbirth, patientData.address]);
   }
   catch(err){
-    logger.error(err);
     return res.status(500).send('SQL Query Error. Check application logs.').end();
   }
   res.status(200).send('Patient data has successfully been submitted.')
