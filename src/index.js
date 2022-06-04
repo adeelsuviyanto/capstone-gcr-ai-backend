@@ -73,8 +73,23 @@ web.get('/', (req, res) => {
   res.send('Backend configured.')
 });
 
-web.post('/registerpatient', (req, res) => {
-  res.send('Placeholder');
+web.post('/registerpatient', async (req, res) => {
+  //Parse JSON-based request body
+  const patientData = JSON.parse(req.body);
+  //If request body is empty then respond with 400 code
+  if(!patientData){
+    return res.status(400).send('Invalid request body.').end();
+  }
+  pool = pool || (await createPoolAndEnsureSchema);
+  try{
+    const stmt = 'INSERT INTO patients (name, sex, dateofbirth, address) VALUES (?, ?, ?, ?)';
+    await pool.query(stmt, [patientData.name, patientData.sex, patientData.dateofbirth, patientData.address]);
+  }
+  catch(err){
+    logger.error(err);
+    return res.status(500).send('SQL Query Error. Check application logs.').end();
+  }
+  res.status(200).send('Patient data has successfully been submitted.')
 })
 
 
