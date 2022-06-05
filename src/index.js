@@ -72,6 +72,7 @@ web.get('/', (req, res) => {
   res.send('Backend configured.')
 });
 
+web.use(express.json());
 web.post('/registerpatient', async (req, res) => {
   //Parse JSON-based request body
   const {patientData} = req.body;
