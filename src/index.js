@@ -77,7 +77,7 @@ web.get('/', (req, res) => {
 
 web.post('/registerpatient', async (req, res) => {
   //Parse JSON-based request body
-  const patientData = res.json(req.body);
+  const {patientData} = res.json(req.body);
   console.log(patientData);
   //If request body is empty then respond with 400 code
   if(!patientData){
