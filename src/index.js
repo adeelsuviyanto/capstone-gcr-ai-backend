@@ -91,7 +91,7 @@ web.post('/registerpatient', async (req, res) => {
   catch(err){
     return res.status(500).send('SQL Query Error. Check application logs.').end();
   }
-  res.status(200).send('Patient data has successfully been submitted.')
+  res.status(200).send('Patient data has successfully been submitted.').end();
 })
 
 
