@@ -24,7 +24,7 @@ const PORT = process.env.PORT || 8080;
 //Cloud SQL: Create pool
 const createPool = async() => {
   const config = {
-    connectionLimit: 5,
+    connectionLimit: 1,
     connectionTimeout: 10000,
     acquireTimeout: 10000,
     waitForConnections: true,
