@@ -17,8 +17,8 @@ const firebaseConfig = require('./firebase')
 //const userAuth = require('./userauth');
 
 //Initialize Express HTTPS server
+//web.use(express.urlencoded({extended: true}));
 web.use(express.json());
-web.use(express.urlencoded({extended: true}));
 const PORT = process.env.PORT || 8080;
 
 //Cloud SQL: Create pool
@@ -66,9 +66,6 @@ web.use(async (req, res, next) => {
     return next(err);
   }
 })
-
-//Making sure Express is able to parse JSON request bodies
-web.use(express.json());
 
 //Endpoints
 web.get('/', (req, res) => {
