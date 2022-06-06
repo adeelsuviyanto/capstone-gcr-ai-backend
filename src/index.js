@@ -83,7 +83,7 @@ web.post('/registerpatient', jsonParser, async (req, res) => {
   if(!patientData){
     return res.status(400).send('Invalid request body.').end();
   }
-  pool = pool || (await createPoolAndEnsureSchema);
+  pool = pool || (await createPoolAndEnsureSchema());
   try{
     const stmt = 'INSERT INTO patients (name, sex, dateofbirth, address) VALUES (?, ?, ?, ?)';
     await pool.query(stmt, [patientData.name, patientData.sex, patientData.dateofbirth, patientData.address]);
@@ -92,8 +92,22 @@ web.post('/registerpatient', jsonParser, async (req, res) => {
     return res.status(500).send('SQL Query Error. Check application logs.').end();
   }
   res.status(200).send('Patient data has successfully been submitted.').end();
-})
+});
 
+web.get('/patientlist', async (req, res) => {
+  pool = pool || (await createPoolAndEnsureSchema());
+  try{
+    //Query patient data, to limit to user configurable entries in the future
+    //As of 6-6-2022, this will query ALL data from SQL table.
+    //Beware!
+    //This will send raw string data in form of a JSON string
+    const patientListQuery = pool.query(`SELECT JSON_ARRAYAGG(JSON_OBJECT('patientid', patientid, 'name', name, 'sex', sex, 'dateofbirth', dateofbirth)) FROM patients`);
+    res.status(200).send(patientListQuery).end();
+  }
+  catch(err){
+    res.status(500).send('Unable to query patient list, could be an SQL Error. Check application logs.').end();
+  }
+});
 
 web.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
