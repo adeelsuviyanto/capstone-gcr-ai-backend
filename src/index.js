@@ -102,7 +102,8 @@ web.get('/patientlist', async (req, res) => {
     //Beware!
     //This will send raw string data in form of a JSON string
     const patientListQuery = pool.query(`SELECT JSON_ARRAYAGG(JSON_OBJECT('patientid', patientid, 'name', name, 'sex', sex, 'dateofbirth', dateofbirth)) FROM patients`);
-    res.status(200).send(patientListQuery).end();
+    const patientList = await patientListQuery;
+    res.status(200).send(patientList).end();
   }
   catch(err){
     res.status(500).send('Unable to query patient list, could be an SQL Error. Check application logs.').end();
