@@ -6,6 +6,11 @@ const express = require('express');
 const web = express();
 const port = 8080;
 
+//Instantiate body-parser
+const bodyParser = require('body-parser');
+const urlencodedParser = bodyParser.urlencoded({extended: false});
+const jsonParser = bodyParser.json();
+
 //Google API initialization
 const {google} = require('googleapis');
 const { Client, setLogger } = require('@grpc/grpc-js');
@@ -17,8 +22,8 @@ const firebaseConfig = require('./firebase')
 //const userAuth = require('./userauth');
 
 //Initialize Express HTTPS server
-web.use(express.urlencoded({extended: true}));
-web.use(express.json());
+//web.use(express.urlencoded({extended: true}));
+//web.use(express.json());
 const PORT = process.env.PORT || 8080;
 
 //Cloud SQL: Create pool
@@ -72,9 +77,9 @@ web.get('/', (req, res) => {
   res.send('Backend configured.')
 });
 
-web.post('/registerpatient', async (req, res) => {
+web.post('/registerpatient', jsonParser, async (req, res) => {
   //Parse JSON-based request body
-  const {patientData} = req.body;
+  const patientData = req.body;
   //const {patientData} = web.json(req.body);
   console.log(req.body.name);
   //If request body is empty then respond with 400 code
