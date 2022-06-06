@@ -17,7 +17,7 @@ const firebaseConfig = require('./firebase')
 //const userAuth = require('./userauth');
 
 //Initialize Express HTTPS server
-//web.use(express.urlencoded({extended: true}));
+web.use(express.urlencoded({extended: true}));
 web.use(express.json());
 const PORT = process.env.PORT || 8080;
 
@@ -67,17 +67,16 @@ web.use(async (req, res, next) => {
   }
 })
 
-//Endpoints
+//Routes
 web.get('/', (req, res) => {
   res.send('Backend configured.')
 });
 
-web.use(express.json());
 web.post('/registerpatient', async (req, res) => {
   //Parse JSON-based request body
   const {patientData} = req.body;
   //const {patientData} = web.json(req.body);
-  console.log(patientData);
+  console.log(req.body);
   //If request body is empty then respond with 400 code
   if(!patientData){
     return res.status(400).send('Invalid request body.').end();
