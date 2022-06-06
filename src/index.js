@@ -21,9 +21,6 @@ const firebaseConfig = require('./firebase')
 //Private initialization
 //const userAuth = require('./userauth');
 
-//Initialize Express HTTPS server
-//web.use(express.urlencoded({extended: true}));
-//web.use(express.json());
 const PORT = process.env.PORT || 8080;
 
 //Cloud SQL: Create pool
@@ -81,7 +78,7 @@ web.post('/registerpatient', jsonParser, async (req, res) => {
   //Parse JSON-based request body
   const patientData = req.body;
   //const {patientData} = web.json(req.body);
-  console.log(patientData);
+  //console.log(patientData);
   //If request body is empty then respond with 400 code
   if(!patientData){
     return res.status(400).send('Invalid request body.').end();
