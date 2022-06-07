@@ -101,9 +101,10 @@ web.get('/patientlist', async (req, res) => {
     //As of 6-6-2022, this will query ALL data from SQL table.
     //Beware!
     //This will send raw string data in form of a JSON string
-    const patientListQuery = pool.query(`SELECT JSON_OBJECT('patientid', patientid, 'name', name, 'sex', sex, 'dateofbirth', dateofbirth) FROM patients ORDER BY patientid`);
+    const patientListQuery = pool.query("SELECT JSON_OBJECT('patientid', patientid, 'name', name, 'sex', sex, 'dateofbirth', dateofbirth) FROM patients ORDER BY patientid");
     const patientList = await patientListQuery;
-    res.status(200).send(patientList).end();
+    let patientListTruncated = patientList.replace(`"JSON_OBJECT('patientid', patientid, 'name', name, 'sex', sex, 'dateofbirth', dateofbirth)": `, ``);
+    res.status(200).send(patientListTruncated).end();
   }
   catch(err){
     res.status(500).send('Unable to query patient list, could be an SQL Error. Check application logs.').end();
