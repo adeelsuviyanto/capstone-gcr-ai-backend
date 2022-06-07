@@ -1,4 +1,6 @@
 //Firebase configuration and initialization
+const firebase = require('firebase-admin');
+ 
 const firebaseConfig = {
     apiKey: "AIzaSyD7QMPmKsgYnx_1DUPOtmhzGCgFBUTb7Ps",
     authDomain: "capstone-project-c22-ps362.firebaseapp.com",

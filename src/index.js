@@ -15,8 +15,6 @@ const jsonParser = bodyParser.json();
 const {google} = require('googleapis');
 const { Client, setLogger } = require('@grpc/grpc-js');
 const createUnixSocketPool = require('./unix-socket');
-const firebaseConfig = require('./firebase')
-
 
 //Private initialization
 //const userAuth = require('./userauth');
@@ -103,8 +101,8 @@ web.get('/patientlist', async (req, res) => {
     //This will send raw string data in form of a JSON string
     const patientListQuery = pool.query("SELECT JSON_OBJECT('patientid', patientid, 'name', name, 'sex', sex, 'dateofbirth', dateofbirth) FROM patients ORDER BY patientid");
     const patientList = await patientListQuery;
-    let patientListTruncated = patientList.replace(`"JSON_OBJECT('patientid', patientid, 'name', name, 'sex', sex, 'dateofbirth', dateofbirth)": `, ``);
-    res.status(200).send(patientListTruncated).end();
+    //let patientListTruncated = patientList.replace(`"JSON_OBJECT('patientid', patientid, 'name', name, 'sex', sex, 'dateofbirth', dateofbirth)": `, ``);
+    res.status(200).send(patientList).end();
   }
   catch(err){
     res.status(500).send('Unable to query patient list, could be an SQL Error. Check application logs.').end();
