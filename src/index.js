@@ -93,19 +93,43 @@ web.post('/registerpatient', jsonParser, async (req, res) => {
 });
 
 web.get('/patientlist', async (req, res) => {
+  //Update 8-6-2022: GET /patientlist now accepts page numbers as query params!
+  let page = req.query.page;
+  let size = req.query.size;
+  if(!page){
+    page = 1;
+  }
+  if(!size){
+    size = 10;
+  }
+  let offset = page - 1 * size;
+
   pool = pool || (await createPoolAndEnsureSchema());
   try{
     //Query patient data, to limit to user configurable entries in the future
     //As of 6-6-2022, this will query ALL data from SQL table.
     //Beware!
     //This will send raw string data in form of a JSON string
-    const patientListQuery = pool.query("SELECT JSON_ARRAYAGG(JSON_OBJECT('patientid', patientid, 'name', name, 'sex', sex, 'dateofbirth', dateofbirth)) FROM patients ORDER BY patientid");
+    const patientListQuery = pool.query("SELECT JSON_ARRAYAGG(JSON_OBJECT('patientid', patientid, 'name', name, 'sex', sex, 'dateofbirth', dateofbirth)) FROM patients ORDER BY patientid LIMIT ? OFFSET ?", [size, offset]);
     const patientList = await patientListQuery;
     //let patientListTruncated = patientList.replace(`"JSON_OBJECT('patientid', patientid, 'name', name, 'sex', sex, 'dateofbirth', dateofbirth)": `, ``);
     res.status(200).send(patientList).end();
   }
   catch(err){
     res.status(500).send('Unable to query patient list, could be an SQL Error. Check application logs.').end();
+  }
+});
+
+web.get('/predictionlist', async (req, res) => {
+  pool = pool || (await createPoolAndEnsureSchema());
+  try{
+    //Query prediction list
+    const predictionlistQuery = pool.query("SELECT JSON_ARRAYAGG(JSON_OBJECT('predictionid', predictionid, 'patientid', patientid, 'image', image, 'predictionresult', predictionresult, 'predictiontimestamp', predictiontimestamp)) FROM predictions ORDER BY predictionid");
+    const predictions = await predictionlistQuery;
+    res.status(200).send(predictions).end();
+  }
+  catch(err){
+    res.status(500).send('Unable to query predictions list, could be an SQL Error. Check application logs.').end();
   }
 });
 
