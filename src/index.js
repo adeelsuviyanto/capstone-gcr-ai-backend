@@ -130,9 +130,17 @@ web.get('/patientlist', async (req, res) => {
 
 web.get('/predictionlist', async (req, res) => {
   pool = pool || (await createPoolAndEnsureSchema());
+  let page = req.query.page;
+  let size = req.query.size;
+  page = Number(page);
+  size = Number(size);
+
+  if(!page) page = 1;
+  if(!size) size = 10;
+  let offset = (page - 1) * size;
   try{
     //Query prediction list
-    const predictionlistQuery = pool.query("SELECT JSON_ARRAYAGG(JSON_OBJECT('predictionid', predictionid, 'patientid', patientid, 'image', image, 'predictionresult', predictionresult, 'predictiontimestamp', predictiontimestamp)) FROM predictions ORDER BY predictionid");
+    const predictionlistQuery = pool.query("SELECT predictionid, patientid, image, predictionresult, predictiontimestamp FROM predictions ORDER BY predictionid LIMIT ? OFFSET ?", [size, offset]);
     const predictions = await predictionlistQuery;
     res.status(200).send(predictions).end();
   }
