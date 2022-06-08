@@ -114,7 +114,7 @@ web.get('/patientlist', async (req, res) => {
     //Beware!
     //This will send raw string data in form of a JSON string
     //const stmt = "SELECT JSON_ARRAYAGG(JSON_OBJECT('patientid', patientid, 'name', name, 'sex', sex, 'dateofbirth', dateofbirth)) FROM (SELECT patientid, name, sex, dateofbirth FROM patients ORDER BY patientid LIMIT ? OFFSET ?) pt";
-    const stmt = "SELECT patientid, name, sex, dateofbirth FROM patients ORDER BY patientid DESC LIMIT ? OFFSET ?"
+    const stmt = "SELECT patientid, name, sex, dateofbirth FROM patients ORDER BY patientid LIMIT ? OFFSET ?";
     console.log(size);
     const patientListQuery = pool.query(stmt, [size, offset]);
     const patientList = await patientListQuery;
@@ -122,7 +122,7 @@ web.get('/patientlist', async (req, res) => {
     res.status(200).send(patientList).end();
   }
   catch(err){
-    res.status(500).send('Unable to query patient list, could be an SQL Error. Check application logs.').end();
+    res.status(500).send(err).end();
   }
 });
 
@@ -135,7 +135,8 @@ web.get('/predictionlist', async (req, res) => {
     res.status(200).send(predictions).end();
   }
   catch(err){
-    res.status(500).send('Unable to query predictions list, could be an SQL Error. Check application logs.').end();
+    //res.status(500).send('Unable to query predictions list, could be an SQL Error. Check application logs.').end();
+    res.status(500).send(err).end();
   }
 });
 
