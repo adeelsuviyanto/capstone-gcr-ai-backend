@@ -96,6 +96,8 @@ web.get('/patientlist', async (req, res) => {
   //Update 8-6-2022: GET /patientlist now accepts page numbers as query params!
   let page = req.query.page;
   let size = req.query.size;
+  size = Number(size);
+  page = Number(page);
   if(!page){
     page = 1;
   }
