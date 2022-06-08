@@ -110,7 +110,7 @@ web.get('/patientlist', async (req, res) => {
     //As of 6-6-2022, this will query ALL data from SQL table.
     //Beware!
     //This will send raw string data in form of a JSON string
-    const stmt = "SELECT JSON_ARRAYAGG(JSON_OBJECT('patientid', patientid, 'name', name, 'sex', sex, 'dateofbirth', dateofbirth)) FROM patients ORDER BY patientid LIMIT ? OFFSET ?";
+    const stmt = "SELECT JSON_ARRAYAGG(JSON_OBJECT('patientid', patientid, 'name', name, 'sex', sex, 'dateofbirth', dateofbirth)) FROM (SELECT patientid, name, sex, dateofbirth FROM patients ORDER BY patientid LIMIT ? OFFSET ?)";
     const patientListQuery = pool.query(stmt, [size, offset]);
     const patientList = await patientListQuery;
     //let patientListTruncated = patientList.replace(`"JSON_OBJECT('patientid', patientid, 'name', name, 'sex', sex, 'dateofbirth', dateofbirth)": `, ``);
