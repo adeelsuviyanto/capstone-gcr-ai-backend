@@ -103,6 +103,9 @@ web.get('/patientlist', async (req, res) => {
     size = 10;
   }
   let offset = page - 1 * size;
+  console.log(page);
+  console.log(size);
+  console.log(offset);
 
   pool = pool || (await createPoolAndEnsureSchema());
   try{
