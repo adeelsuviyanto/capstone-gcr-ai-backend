@@ -93,6 +93,19 @@ web.post('/registerpatient', jsonParser, async (req, res) => {
 });
 
 web.get('/patientlist', async (req, res) => {
+  //Update 8-6-2022 new: this API will also be used for direct patient information
+  if(req.query.patientid && !req.query.page && !req.query.size){
+    patientID = req.query.patientid;
+    patientID = Number(patientID);
+    pool = pool || (await createPoolAndEnsureSchema());
+    try{
+      const patientInfo = pool.query("SELECT * FROM patients WHERE patientid=?", [patientID]);
+      res.status(200).send(await patientInfo).end();
+    }
+    catch(err){
+      res.status(500).send(err).end();
+    }
+  }
   //Update 8-6-2022: GET /patientlist now accepts page numbers as query params!
   let page = req.query.page;
   let size = req.query.size;
