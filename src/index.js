@@ -102,7 +102,7 @@ web.get('/patientlist', async (req, res) => {
   if(!size){
     size = 10;
   }
-  let offset = page - 1 * size;
+  let offset = (page - 1) * size;
   console.log(page);
   console.log(size);
   console.log(offset);
