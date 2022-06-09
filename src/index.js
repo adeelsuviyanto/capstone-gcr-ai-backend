@@ -5,6 +5,8 @@
 const express = require('express');
 const web = express();
 const port = 8080;
+const cors = require('cors');
+web.use(cors());
 
 //Instantiate body-parser
 const bodyParser = require('body-parser');
@@ -16,12 +18,18 @@ const {google} = require('googleapis');
 const { Client, setLogger } = require('@grpc/grpc-js');
 const createUnixSocketPool = require('./unix-socket');
 
-//Private initialization
-//const userAuth = require('./userauth');
+//Firebase Admin initialization
+const admin = require('firebase-admin');
+admin.initializeApp({
+  credential: admin.credential.applicationDefault(),
+  databaseURL: 'https://capstone-project-c22-ps362-default-rtdb.asia-southeast1.firebasedatabase.app/'
+});
 
 const PORT = process.env.PORT || 8080;
 
-//Cloud SQL: Create pool
+
+//Cloud SQL initialization
+//Create UDP connection pool
 const createPool = async() => {
   const config = {
     connectionLimit: 1,
@@ -52,7 +60,6 @@ const createPoolAndEnsureSchema = async () =>
       throw err;
     });
 let pool;
-
 //Creating UDP Socket Pool and ensuring table schema
 web.use(async (req, res, next) => {
   if(pool){
@@ -66,6 +73,15 @@ web.use(async (req, res, next) => {
     return next(err);
   }
 })
+
+//Firebase Authentication initialization
+function checkAuth(req, res, next) {
+  if(req.headers.authtoken){
+    admin.auth().verifyIdToken(req.headers.authtoken).then(next()).catch(res.status(403).send('Unauthorized'));
+  }
+  else res.status(403).send('Unauthorized');
+}
+web.use(checkAuth);
 
 //Routes
 web.get('/', (req, res) => {
@@ -124,11 +140,6 @@ web.get('/patientlist', async (req, res) => {
 
   pool = pool || (await createPoolAndEnsureSchema());
   try{
-    //Query patient data, to limit to user configurable entries in the future
-    //As of 6-6-2022, this will query ALL data from SQL table.
-    //Beware!
-    //This will send raw string data in form of a JSON string
-    //const stmt = "SELECT JSON_ARRAYAGG(JSON_OBJECT('patientid', patientid, 'name', name, 'sex', sex, 'dateofbirth', dateofbirth)) FROM (SELECT patientid, name, sex, dateofbirth FROM patients ORDER BY patientid LIMIT ? OFFSET ?) pt";
     const stmt = "SELECT patientid, name, sex, dateofbirth FROM patients ORDER BY patientid LIMIT ? OFFSET ?";
     console.log(size);
     const patientListQuery = pool.query(stmt, [size, offset]);
