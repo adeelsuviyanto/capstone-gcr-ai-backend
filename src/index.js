@@ -81,9 +81,9 @@ function checkAuth(req, res, next) {
   let bearer = auth.split(' ');
   if(auth && bearer[0] === 'Bearer'){    
     console.log(bearer[1]);
-    admin.auth().verifyIdToken(bearer[1]).then(next()).catch(res.status(403).send('Unauthorized'));
+    admin.auth().verifyIdToken(bearer[1]).then(next()).catch(res.status(403).send('Unauthorized').end());
   }
-  else res.status(403).send('Unauthorized');
+  else res.status(403).send('Unauthorized').end();
 }
 web.use(checkAuth);
 
