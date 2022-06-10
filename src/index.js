@@ -78,9 +78,9 @@ web.use(async (req, res, next) => {
 function checkAuth(req, res, next) {
   console.log(req.headers);
   let auth = req.headers.authorization;
-  if(auth){
-    let bearer = auth.split(' ');
-    console.log(bearer[2]);
+  let bearer = auth.split(' ');
+  if(auth && bearer[0] === 'Bearer'){    
+    console.log(bearer[1]);
     admin.auth().verifyIdToken(bearer[2]).then(next()).catch(res.status(403).send('Unauthorized'));
   }
   else res.status(403).send('Unauthorized');
