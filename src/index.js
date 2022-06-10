@@ -75,17 +75,29 @@ web.use(async (req, res, next) => {
 })
 
 //Firebase Authentication initialization
-function checkAuth(req, res, next) {
-  console.log(req.headers);
-  let auth = req.headers.authorization;
-  let bearer = auth.split(' ');
-  if(auth && bearer[0] === 'Bearer'){    
-    console.log(bearer[1]);
-    admin.auth().verifyIdToken(bearer[1]).then(next()).catch(res.status(403).send('Unauthorized').end());
+web.use(decodeToken);
+async function decodeToken(req, res, next){
+  if(req.headers?.authorization?.startsWith('Bearer ')){
+    const token = req.headers.authorization.split('Bearer ')[1];
+    
+    try{
+      const decodedToken = await admin.auth().verifyIdToken(token);
+      req['currentUser'] = decodedToken;
+    }
+    catch(err){
+      console.log(err);
+    }
   }
-  else res.status(403).send('Unauthorized').end();
+  next();
 }
-web.use(checkAuth);
+web.use(verifyUser);
+function verifyUser(req, res, next){
+  if(!req['currentUser']){
+    res.status(403).send('Unauthorized').end();
+    console.log('Authorization failure');
+  }
+  else next();
+}
 
 //Routes
 web.get('/', (req, res) => {
