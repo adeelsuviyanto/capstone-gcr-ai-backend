@@ -84,8 +84,8 @@ async function decodeToken(req, res, next){
       const decodedToken = await admin.auth().verifyIdToken(token);
       req['currentUser'] = decodedToken;
     }
-    catch(err){
-      console.log(err);
+    catch(authErr){
+      console.log(authErr);
     }
   }
   next();
