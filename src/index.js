@@ -76,7 +76,8 @@ web.use(async (req, res, next) => {
 
 //Firebase Authentication initialization
 function checkAuth(req, res, next) {
-  let auth = req.header['Authorization'];
+  console.log(req.headers);
+  let auth = req.headers.authorization;
   if(auth){
     let bearer = auth.split(' ');
     console.log(bearer[2]);
