@@ -36,18 +36,6 @@ const PORT = process.env.PORT || 8080;
 //Multer initialization (for file handling)
 
 //11-06-2022 Temporary storage configuration:
-let storage = multer.diskStorage({
-  destination: function(req, file, callback){
-    fs.mkdir('./uploads', function(err){
-      if(err) console.log(err.stack);
-      else callback(null, './uploads');
-    });
-  },
-  filename: function(req, file, callback){
-    callback(null, file.fieldname + '-' + Date.now() + '.' + file.originalname.split('.')[file.originalname.split('.').length -1]);
-  }
-})
-
 const multer = Multer({
   //Below is commented to test the endpoint 11-06-2022
   //storage: Multer.memoryStorage(),
@@ -66,6 +54,18 @@ const multer = Multer({
   limits: {
     fileSize: 5 * 1024 * 1024,
   },
+});
+
+let storage = multer.diskStorage({
+  destination: function(req, file, callback){
+    fs.mkdir('./uploads', function(err){
+      if(err) console.log(err.stack);
+      else callback(null, './uploads');
+    });
+  },
+  filename: function(req, file, callback){
+    callback(null, file.fieldname + '-' + Date.now() + '.' + file.originalname.split('.')[file.originalname.split('.').length -1]);
+  }
 });
 
 //Files container (GCS bucket) - Disabled for endpoint test 11-06-2022
