@@ -35,24 +35,11 @@ admin.initializeApp({
 const PORT = process.env.PORT || 8080;
 
 //Multer initialization (for file handling)
-
-//11-06-2022 Temporary storage configuration:
-/*const multer = Multer({
-  //Below is commented to test the endpoint 11-06-2022
-  //storage: Multer.memoryStorage(),
-
-  //Temporary storage configuration for endpoint test
-  storage: diskStorage({
-    destination: function(req, file, callback){
-      fs.mkdir('./uploads', function(err){
-        if(err) console.log(err.stack);
-        else callback(null, './uploads');
-      });
-    },
-    filename: function(req, file, callback){
-      callback(null, file.fieldname + '-' + Date.now() + '.' + file.originalname.split('.')[file.originalname.split('.').length -1]);
-    }
-  }),
+const upload = multer({
+  storage: memoryStorage,
+  limits:{
+    fileSize: 5*1024*1024,
+  },
   fileFilter: function (req,file, callback){
     var ext = path.extname(file.originalname);
     if(ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg'){
@@ -60,28 +47,10 @@ const PORT = process.env.PORT || 8080;
     }
     callback(null, true);
   },
-
-
-  limits: {
-    fileSize: 5 * 1024 * 1024,
-  },
-});*/
-
-/*const diskStorage = multer.diskStorage({
-  destination: function(req, file, callback){
-    fs.mkdir('../uploads', function(err){
-      if(err) console.log(err);
-      else callback(null, path.join(__dirname, '../uploads'));
-    })
-  },
-  filename: function(req, file, callback){
-    callback(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-  },
-});*/
-const upload = multer({storage: memoryStorage});
+});
 
 //Files container (GCS bucket) - Disabled for endpoint test 11-06-2022
-//const bucket = storage.bucket(process.env.GCLOUD_STORAGE_BUCKET);
+const bucket = storage.bucket('c22-ps362-public-uploads');
 
 //Cloud SQL initialization
 //Create UDP connection pool
@@ -250,16 +219,21 @@ web.get('/predictionlist', async (req, res) => {
 
 web.post('/predict', upload.single('file'), (req, res, next) => {
   if(!req.file){
-    res.status(400).send('No image uploaded.');
+    res.status(400).send('No image uploaded.').end();
   }
-  try{
-    console.log(req.file.path);
-    res.status(200).send(req.file.path).end();
-  }
-  catch(err){
-    console.log(err);
-    res.status(400).send(err).end();
-  }
+  const blob = bucket.file(req.file.originalname);
+  const blobStream = blob.createWriteStream();
+
+  blobStream.on('error', err => {
+    next(err);
+  });
+  blobStream.on('finish', () => {
+    const publicUrl = format(`https://storage.googleapis.com/${bucket.name}/${blob.name}`);
+    res.status(200).send(publicUrl);
+  });
+
+  blobStream.end(req.file.buffer);
+
 });
 
 web.listen(PORT, () => {
