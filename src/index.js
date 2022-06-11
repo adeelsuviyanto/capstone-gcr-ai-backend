@@ -246,7 +246,7 @@ web.get('/predictionlist', async (req, res) => {
   }
 });
 
-web.post('/predict', multer({storage: diskStorage}), (req, res, next) => {
+web.post('/predict', multer({storage: diskStorage}), (req, res) => {
   if(!req.file){
     res.status(400).send('No image uploaded.');
   }
