@@ -26,6 +26,7 @@ const createUnixSocketPool = require('./unix-socket');
 
 //Firebase Admin initialization
 const admin = require('firebase-admin');
+const { diskStorage } = require('multer');
 admin.initializeApp({
   credential: admin.credential.applicationDefault(),
   databaseURL: 'https://capstone-project-c22-ps362-default-rtdb.asia-southeast1.firebasedatabase.app/'
@@ -41,7 +42,17 @@ const multer = Multer({
   //storage: Multer.memoryStorage(),
 
   //Temporary storage configuration for endpoint test
-  storage: storage,
+  storage: diskStorage({
+    destination: function(req, file, callback){
+      fs.mkdir('./uploads', function(err){
+        if(err) console.log(err.stack);
+        else callback(null, './uploads');
+      });
+    },
+    filename: function(req, file, callback){
+      callback(null, file.fieldname + '-' + Date.now() + '.' + file.originalname.split('.')[file.originalname.split('.').length -1]);
+    }
+  }),
   fileFilter: function (req,file, callback){
     var ext = path.extname(file.originalname);
     if(ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg'){
@@ -54,18 +65,6 @@ const multer = Multer({
   limits: {
     fileSize: 5 * 1024 * 1024,
   },
-});
-
-let storage = multer.diskStorage({
-  destination: function(req, file, callback){
-    fs.mkdir('./uploads', function(err){
-      if(err) console.log(err.stack);
-      else callback(null, './uploads');
-    });
-  },
-  filename: function(req, file, callback){
-    callback(null, file.fieldname + '-' + Date.now() + '.' + file.originalname.split('.')[file.originalname.split('.').length -1]);
-  }
 });
 
 //Files container (GCS bucket) - Disabled for endpoint test 11-06-2022
