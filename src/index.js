@@ -251,13 +251,14 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
   if(!req.file){
     res.status(400).send('No image uploaded.');
   }
-  upload(req, res, function(err) {
-    if(err) res.status(400).send(err).end();
-    else{
-      console.log(req.file.path);
-      res.status(200).send('File uploaded.').end();
-    }
-  });
+  try{
+    console.log(req.file.path);
+    res.status(200).send(req.file.path).end();
+  }
+  catch(err){
+    console.log(err);
+    res.status(400).send(err).end();
+  }
 });
 
 web.listen(PORT, () => {
