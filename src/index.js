@@ -6,7 +6,7 @@ const express = require('express');
 const web = express();
 const port = 8080;
 const cors = require('cors');
-const Multer = require('multer');
+const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const request = require('request');
@@ -37,7 +37,7 @@ const PORT = process.env.PORT || 8080;
 //Multer initialization (for file handling)
 
 //11-06-2022 Temporary storage configuration:
-const multer = Multer({
+/*const multer = Multer({
   //Below is commented to test the endpoint 11-06-2022
   //storage: Multer.memoryStorage(),
 
@@ -64,6 +64,18 @@ const multer = Multer({
 
   limits: {
     fileSize: 5 * 1024 * 1024,
+  },
+});*/
+
+const diskStorage = multer.diskStorage({
+  destination: function(req, file, callback){
+    fs.mkdir('../uploads', function(err){
+      if(err) console.log(err);
+      else callback(null, path.join(__dirname, '../uploads'));
+    })
+  },
+  filename: function(req, file, callback){
+    callback(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
   },
 });
 
@@ -235,8 +247,7 @@ web.get('/predictionlist', async (req, res) => {
   }
 });
 
-web.post('/predict', (req, res, next) => {
-  let upload = multer.single('userFile');
+web.post('/predict', multer({storage: diskStorage}), (req, res, next) => {
   if(!req.file){
     res.status(400).send('No image uploaded.');
   }
@@ -244,7 +255,7 @@ web.post('/predict', (req, res, next) => {
     if(err) res.status(400).send(err).end();
     else{
       console.log(req.file.path);
-      res.status(200).send('File uploaded.');
+      res.status(200).send('File uploaded.').end();
     }
   });
 })
