@@ -6,6 +6,10 @@ const express = require('express');
 const web = express();
 const port = 8080;
 const cors = require('cors');
+const Multer = require('multer');
+const fs = require('fs');
+const path = require('path');
+const request = require('request');
 web.use(cors());
 
 //Instantiate body-parser
@@ -15,8 +19,10 @@ const jsonParser = bodyParser.json();
 
 //Google API initialization
 const {google} = require('googleapis');
+const {Storage} = require('@google-cloud/storage');
 const { Client, setLogger } = require('@grpc/grpc-js');
 const createUnixSocketPool = require('./unix-socket');
+//const storage = new Storage(); disabled temporarily for endpoint test 11-06-2022
 
 //Firebase Admin initialization
 const admin = require('firebase-admin');
@@ -27,6 +33,43 @@ admin.initializeApp({
 
 const PORT = process.env.PORT || 8080;
 
+//Multer initialization (for file handling)
+
+//11-06-2022 Temporary storage configuration:
+let storage = multer.diskStorage({
+  destination: function(req, file, callback){
+    fs.mkdir('./uploads', function(err){
+      if(err) console.log(err.stack);
+      else callback(null, './uploads');
+    });
+  },
+  filename: function(req, file, callback){
+    callback(null, file.fieldname + '-' + Date.now() + '.' + file.originalname.split('.')[file.originalname.split('.').length -1]);
+  }
+})
+
+const multer = Multer({
+  //Below is commented to test the endpoint 11-06-2022
+  //storage: Multer.memoryStorage(),
+
+  //Temporary storage configuration for endpoint test
+  storage: storage,
+  fileFilter: function (req,file, callback){
+    var ext = path.extname(file.originalname);
+    if(ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg'){
+      return callback(new Error('Only images are allowed.'));
+    }
+    callback(null, true);
+  },
+
+
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+});
+
+//Files container (GCS bucket) - Disabled for endpoint test 11-06-2022
+//const bucket = storage.bucket(process.env.GCLOUD_STORAGE_BUCKET);
 
 //Cloud SQL initialization
 //Create UDP connection pool
@@ -100,8 +143,11 @@ function verifyUser(req, res, next){
 }
 
 //Routes
+//Update 10-06-2022: All routes are now secured by Firebase Authentication
+
+//Basic route:
 web.get('/', (req, res) => {
-  res.send('Backend configured.')
+  res.send('Brain Tumor Detection backend. Backend configured. Copyright 2022 Bangkit Product-based Capstone Team C22-PS362').end();
 });
 
 web.post('/registerpatient', jsonParser, async (req, res) => {
@@ -125,7 +171,7 @@ web.post('/registerpatient', jsonParser, async (req, res) => {
 });
 
 web.get('/patientlist', async (req, res) => {
-  //Update 8-6-2022 new: this API will also be used for direct patient information
+  //Update 8-6-2022 new: this API endpoint will also be used for direct patient information
   if(req.query.patientid && !req.query.page && !req.query.size){
     patientID = req.query.patientid;
     patientID = Number(patientID);
@@ -189,6 +235,20 @@ web.get('/predictionlist', async (req, res) => {
     res.status(500).send(err).end();
   }
 });
+
+web.post('/predict', (req, res, next) => {
+  let upload = multer.single('userFile');
+  if(!req.file){
+    res.status(400).send('No image uploaded.');
+  }
+  upload(req, res, function(err) {
+    if(err) res.status(400).send(err).end();
+    else{
+      console.log(req.file.path);
+      res.status(200).send('File uploaded.');
+    }
+  });
+})
 
 web.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
