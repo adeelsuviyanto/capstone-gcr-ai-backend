@@ -36,7 +36,7 @@ const PORT = process.env.PORT || 8080;
 
 //Multer initialization (for file handling)
 const upload = multer({
-  storage: memoryStorage,
+  storage: multer.memoryStorage(),
   limits:{
     fileSize: 5*1024*1024,
   },
@@ -73,7 +73,7 @@ const ensureSchema = async pool => {
       dateofbirth DATE NOT NULL, address VARCHAR (128));`
   )
   console.log("Table 'patients' exists.");
-}
+};
 
 const createPoolAndEnsureSchema = async () => 
   await createPool()
