@@ -26,7 +26,6 @@ const createUnixSocketPool = require('./unix-socket');
 
 //Firebase Admin initialization
 const admin = require('firebase-admin');
-const { diskStorage } = require('multer');
 admin.initializeApp({
   credential: admin.credential.applicationDefault(),
   databaseURL: 'https://capstone-project-c22-ps362-default-rtdb.asia-southeast1.firebasedatabase.app/'
