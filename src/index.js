@@ -246,7 +246,7 @@ web.get('/predictionlist', async (req, res) => {
   }
 });
 
-web.post('/predict', multer({storage: diskStorage}), (req, res) => {
+web.post('/predict', multer({storage: diskStorage}).single('file'), (req, res) => {
   if(!req.file){
     res.status(400).send('No image uploaded.');
   }
@@ -257,7 +257,7 @@ web.post('/predict', multer({storage: diskStorage}), (req, res) => {
       res.status(200).send('File uploaded.').end();
     }
   });
-})
+});
 
 web.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
