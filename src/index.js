@@ -77,6 +77,7 @@ const diskStorage = multer.diskStorage({
     callback(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
   },
 });
+const upload = multer({storage: diskStorage});
 
 //Files container (GCS bucket) - Disabled for endpoint test 11-06-2022
 //const bucket = storage.bucket(process.env.GCLOUD_STORAGE_BUCKET);
@@ -246,7 +247,7 @@ web.get('/predictionlist', async (req, res) => {
   }
 });
 
-web.post('/predict', multer({storage: diskStorage}).single('file'), (req, res) => {
+web.post('/predict', upload.single('file'), (req, res, next) => {
   if(!req.file){
     res.status(400).send('No image uploaded.');
   }
