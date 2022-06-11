@@ -50,6 +50,7 @@ const upload = multer({
 });
 
 //Files container (GCS bucket) - Disabled for endpoint test 11-06-2022
+const storage = new Storage();
 const bucket = storage.bucket('c22-ps362-public-uploads');
 
 //Cloud SQL initialization
