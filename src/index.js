@@ -262,8 +262,8 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
   const fileName = 'PRED' + '-' + req.query.patientid + '-' + Date.now() + '.' + req.file.originalname.split('.')[req.file.originalname.split('.').length - 1];
 
   //Streamify buffer to file for ML backend
-  const writeStream = fs.createWriteStream(`/tmp/${fileName}`);
-  streamifier.createReadStream(req.file.buffer).pipe(writeStream);
+  const newPath = `/tmp/${fileName}`;
+  fs.writeFileSync(newPath, req.file.buffer);
 
   //Re-create file buffer
   const predFile = fs.readFileSync(`/tmp/${fileName}`);
