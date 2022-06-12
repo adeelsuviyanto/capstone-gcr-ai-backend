@@ -50,6 +50,7 @@ const upload = multer({
     callback(null, true);
   },
 });
+/*
 const tempStore = multer({
   storage: multer.diskStorage({
     destination: function(req, file, callback){
@@ -60,7 +61,7 @@ const tempStore = multer({
     /*filename: function(req, file, callback){
       callback(null, 'PRED' + '-' + req.query.patientid + '-' + Date.now() + '.' + req.file.originalname.split('.')[req.file.originalname.split('.').length - 1])
     }*/
-  }),
+  /*}),
   limits:{
     fileSize: 5*1024*1024,
   },
@@ -71,11 +72,11 @@ const tempStore = multer({
     }
     callback(null, true);
   },
-});
+});*/
 
 function fileUpload(req, res, next){
   upload.single('file')(req, res, next);
-  tempStore.single('file')(req, res, next);
+  //tempStore.single('file')(req, res, next);
 }
 
 //Files container (GCS bucket) - Disabled for endpoint test 11-06-2022
@@ -247,7 +248,7 @@ web.get('/predictionlist', async (req, res) => {
   }
 });
 
-web.post('/predict', fileUpload, (req, res, next) => {
+web.post('/predict', upload.single('file'), (req, res, next) => {
   if(!req.file){
     res.status(400).send('No image uploaded.').end();
   }
