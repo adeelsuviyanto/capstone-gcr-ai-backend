@@ -223,7 +223,10 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
   if(!req.file){
     res.status(400).send('No image uploaded.').end();
   }
-  const fileName = 'PRED' + '-' + req.query.patientid + '-' + Date.now() + req.file.originalname.split('.')[req.file.originalname.split('.').length - 1];
+  if(!req.query.patientid){
+    res.status(400).send('No patient ID provideed.').end();
+  }
+  const fileName = 'PRED' + '-' + req.query.patientid + '-' + Date.now() + '.' + req.file.originalname.split('.')[req.file.originalname.split('.').length - 1];
   const blob = bucket.file(fileName);
   const blobStream = blob.createWriteStream();
 
