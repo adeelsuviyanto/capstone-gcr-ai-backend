@@ -10,6 +10,7 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const request = require('request');
+const {format} = require('util');
 web.use(cors());
 
 //Instantiate body-parser
