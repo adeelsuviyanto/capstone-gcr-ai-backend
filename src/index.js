@@ -53,6 +53,7 @@ const upload = multer({
 const tempStore = multer({
   storage: multer.diskStorage({
     destination: function(req, file, callback){
+      if(!fs.existsSync('/tmp/uploads')) fs.mkdirSync('/tmp/uploads');
       callback(null, path.join('/tmp/uploads'));
       console.log(file.filename);
     },
