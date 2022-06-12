@@ -266,7 +266,7 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
   streamifier.createReadStream(req.file.buffer).pipe(writeStream);
 
   //Re-create file buffer
-  const predFile = fs.readFile(`/tmp/${fileName}`);
+  const predFile = fs.readFileSync(`/tmp/${fileName}`);
 
   //Upload to Google Cloud Storage
   const blob = bucket.file(predFile);
