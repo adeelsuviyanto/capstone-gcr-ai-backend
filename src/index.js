@@ -226,6 +226,14 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
   if(!req.query.patientid){
     res.status(400).send('No patient ID provideed.').end();
   }
+  //Piping to ML backend
+  const newurl = 'https://getpredict-d34xsyfyta-as.a.run.app'
+  req.pipe(request({
+    qs: req.query,
+    uri: newurl
+  })).pipe(res);
+  
+  //Storing file to cloud storage
   const fileName = 'PRED' + '-' + req.query.patientid + '-' + Date.now() + '.' + req.file.originalname.split('.')[req.file.originalname.split('.').length - 1];
   const blob = bucket.file(fileName);
   const blobStream = blob.createWriteStream();
@@ -235,7 +243,7 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
   });
   blobStream.on('finish', () => {
     const publicUrl = format(`https://storage.googleapis.com/${bucket.name}/${blob.name}`);
-    res.status(200).send(publicUrl + ' ' + 'Upload Success.');
+    //res.status(200).send(publicUrl + ' ' + 'Upload Success.');
   });
 
   blobStream.end(req.file.buffer);
