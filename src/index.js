@@ -264,7 +264,7 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
   /*//Streamify buffer to file for ML backend
   const newPath = `/tmp/${fileName}`;
   fs.writeFileSync(newPath, req.file.buffer);*/
-
+  /*
   //Re-create file buffer
   const predFile = fs.readFileSync(`/tmp/uploads/${req.file.filename}`);
   console.log(req.file.filename);
@@ -279,7 +279,7 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
   blobStream.on('finish', () => {
     const publicUrl = format(`https://storage.googleapis.com/${bucket.name}/${blob.name}`);
     res.status(200).send(publicUrl + ' ' + 'Upload Success.');
-  });
+  });*/
   
   //Piping to ML backend
   const newurl = 'https://getpredict-d34xsyfyta-as.a.run.app';
@@ -291,7 +291,7 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
     console.log(resp.body);
   });
   
-  blobStream.end();
+  //blobStream.end();
 
 });
 
