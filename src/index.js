@@ -37,7 +37,12 @@ const PORT = process.env.PORT || 8080;
 
 //Multer initialization (for file handling)
 const upload = multer({
-  storage: multer.memoryStorage(),
+  //storage: multer.memoryStorage(), disabled for testing using /tmp as storage
+  storage: multer.diskStorage({
+    destination: function(req, file, callback){
+      callback(null, path.join('/tmp/uploads'));
+    }
+  }),
   limits:{
     fileSize: 5*1024*1024,
   },
