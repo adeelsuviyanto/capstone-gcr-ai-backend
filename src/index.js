@@ -272,6 +272,11 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
   //Streamify buffer to file for ML backend
   const writeStream = fs.createWriteStream(`/tmp/${fileName}`);
   streamifier.createReadStream(req.file.buffer).pipe(writeStream);
+  //testing code: list file and print to console
+  fs.readdirSync('/tmp/').forEach(file => {
+    console.log(file);
+  });
+
   //Piping to ML backend
   const newurl = 'https://getpredict-d34xsyfyta-as.a.run.app';
   
