@@ -273,7 +273,7 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
   const writeStream = fs.createWriteStream(`/tmp/${fileName}`);
   streamifier.createReadStream(req.file.buffer).pipe(writeStream);
   //testing code: list file and print to console
-  fs.readdirSync('/tmp/').forEach(file => {
+  fs.readdirSync('/tmp').forEach(file => {
     console.log(file);
   });
 
