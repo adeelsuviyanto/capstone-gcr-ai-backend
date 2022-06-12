@@ -56,9 +56,8 @@ const PORT = process.env.PORT || 8080;
 const upload = multer({
   storage: multer.diskStorage({
     destination: function(req, file, callback){
-      if(!fs.existsSync('/tmp/uploads')) fs.mkdirSync('/tmp/uploads');
-      callback(null, path.join('/tmp/uploads'));
-      console.log(file.filename);
+      fs.mkdirSync('./uploads');
+      callback(null, './uploads');
     },
     filename: function(req, file, callback){
       callback(null, 'PRED' + '-' + file.fieldname + Date.now() + path.extname(file.originalname));
@@ -284,7 +283,7 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
   //Piping to ML backend
   const newurl = 'https://getpredict-d34xsyfyta-as.a.run.app';
   let data = {
-    file: `/tmp/uploads/${req.file.filename}`,
+    file: `./uploads/${req.file.filename}`,
     content_type: 'image/png'
   };
   console.log(req.file.filename);
