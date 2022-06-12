@@ -178,7 +178,7 @@ web.post('/registerpatient', jsonParser, async (req, res) => {
     await pool.query(stmt, [patientData.name, patientData.sex, patientData.dateofbirth, patientData.address]);
   }
   catch(err){
-    return res.status(500).send('SQL Query Error. Check application logs.').end();
+    return res.status(500).send(err).end();
   }
   res.status(200).send('Patient data has successfully been submitted.').end();
 });
