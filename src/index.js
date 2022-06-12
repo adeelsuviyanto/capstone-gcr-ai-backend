@@ -284,9 +284,10 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
   //Piping to ML backend
   const newurl = 'https://getpredict-d34xsyfyta-as.a.run.app';
   let data = {
-    file: `/tmp/${req.file.filename}`,
+    file: `/tmp/uploads/${req.file.filename}`,
     content_type: 'image/png'
   };
+  console.log(req.file.filename);
   needle.post(newurl, data, {multipart: true}, function(err, resp){
     console.log(resp.body);
   });
