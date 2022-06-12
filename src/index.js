@@ -257,9 +257,19 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
   if(!req.query.patientid){
     res.status(400).send('No patient ID provideed.').end();
   }
-  //Storing file to cloud storage
+  
+  //Defining file name
   const fileName = 'PRED' + '-' + req.query.patientid + '-' + Date.now() + '.' + req.file.originalname.split('.')[req.file.originalname.split('.').length - 1];
-  const blob = bucket.file(fileName);
+
+  //Streamify buffer to file for ML backend
+  const writeStream = fs.createWriteStream(`/tmp/${fileName}`);
+  streamifier.createReadStream(req.file.buffer).pipe(writeStream);
+
+  //Re-create file buffer
+  const predFile = fs.readFile(`/tmp/${fileName}`);
+
+  //Upload to Google Cloud Storage
+  const blob = bucket.file(predFile);
   const blobStream = blob.createWriteStream();
 
   blobStream.on('error', err => {
@@ -269,10 +279,6 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
     const publicUrl = format(`https://storage.googleapis.com/${bucket.name}/${blob.name}`);
     res.status(200).send(publicUrl + ' ' + 'Upload Success.');
   });
-
-  //Streamify buffer to file for ML backend
-  const writeStream = fs.createWriteStream(`/tmp/${fileName}`);
-  streamifier.createReadStream(req.file.buffer).pipe(writeStream);
   
   //Piping to ML backend
   const newurl = 'https://getpredict-d34xsyfyta-as.a.run.app';
