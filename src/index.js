@@ -39,31 +39,8 @@ const PORT = process.env.PORT || 8080;
 
 //Multer initialization (for file handling)
 //upload handles file upload to GCS
-const upload = multer({
+/*const upload = multer({
   storage: multer.memoryStorage(),
-  limits:{
-    fileSize: 5*1024*1024,
-  },
-  fileFilter: function (req,file, callback){
-    var ext = path.extname(file.originalname);
-    if(ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg'){
-      return callback(new Error('Only images are allowed.'));
-    }
-    callback(null, true);
-  },
-});
-/*
-const tempStore = multer({
-  storage: multer.diskStorage({
-    destination: function(req, file, callback){
-      if(!fs.existsSync('/tmp/uploads')) fs.mkdirSync('/tmp/uploads');
-      callback(null, path.join('/tmp/uploads'));
-      console.log(file.filename);
-    },
-    /*filename: function(req, file, callback){
-      callback(null, 'PRED' + '-' + req.query.patientid + '-' + Date.now() + '.' + req.file.originalname.split('.')[req.file.originalname.split('.').length - 1])
-    }*/
-  /*}),
   limits:{
     fileSize: 5*1024*1024,
   },
@@ -76,10 +53,33 @@ const tempStore = multer({
   },
 });*/
 
-function fileUpload(req, res, next){
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: function(req, file, callback){
+      if(!fs.existsSync('/tmp/uploads')) fs.mkdirSync('/tmp/uploads');
+      callback(null, path.join('/tmp/uploads'));
+      console.log(file.filename);
+    },
+    filename: function(req, file, callback){
+      callback(null, 'PRED' + '-' + file.fieldname + Date.now() + path.extname(file.originalname));
+    }
+  }),
+  limits:{
+    fileSize: 5*1024*1024,
+  },
+  fileFilter: function (req,file, callback){
+    var ext = path.extname(file.originalname);
+    if(ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg'){
+      return callback(new Error('Only images are allowed.'));
+    }
+    callback(null, true);
+  },
+});
+
+/*function fileUpload(req, res, next){
   upload.single('file')(req, res, next);
   //tempStore.single('file')(req, res, next);
-}
+}*/
 
 //Files container (GCS bucket) - Disabled for endpoint test 11-06-2022
 const storage = new Storage();
@@ -255,18 +255,19 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
     res.status(400).send('No image uploaded.').end();
   }
   if(!req.query.patientid){
-    res.status(400).send('No patient ID provideed.').end();
+    res.status(400).send('No patient ID provided.').end();
   }
   
   //Defining file name
-  const fileName = 'PRED' + '-' + req.query.patientid + '-' + Date.now() + '.' + req.file.originalname.split('.')[req.file.originalname.split('.').length - 1];
+  //const fileName = 'PRED' + '-' + req.query.patientid + '-' + Date.now() + '.' + req.file.originalname.split('.')[req.file.originalname.split('.').length - 1];
 
-  //Streamify buffer to file for ML backend
+  /*//Streamify buffer to file for ML backend
   const newPath = `/tmp/${fileName}`;
-  fs.writeFileSync(newPath, req.file.buffer);
+  fs.writeFileSync(newPath, req.file.buffer);*/
 
   //Re-create file buffer
-  const predFile = fs.readFileSync(`/tmp/${fileName}`);
+  const predFile = fs.readFileSync(`/tmp/uploads/${req.file.filename}`);
+  console.log(req.file.filename);
 
   //Upload to Google Cloud Storage
   const blob = bucket.file(predFile);
@@ -283,14 +284,14 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
   //Piping to ML backend
   const newurl = 'https://getpredict-d34xsyfyta-as.a.run.app';
   let data = {
-    file: `/tmp/${fileName}`,
+    file: `/tmp/${req.file.filename}`,
     content_type: 'image/png'
   };
   needle.post(newurl, data, {multipart: true}, function(err, resp){
     console.log(resp.body);
   });
   
-  blobStream.end(req.file.buffer);
+  blobStream.end();
 
 });
 
