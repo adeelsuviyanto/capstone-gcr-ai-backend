@@ -287,8 +287,17 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
     content_type: 'image/png'
   };
   console.log(req.file.filename);
+
+  //listing files in uploads dir
+  fs.readdir('./uploads', function(err, files) {
+    if(err) console.log(err);
+    files.forEach(function(file){
+      console.log(file);
+    });
+  });
+
   needle.post(newurl, data, {multipart: true}, function(err, resp){
-    console.log(resp.body);
+    res.status(200).json(resp.body);
   });
   
   //blobStream.end();
