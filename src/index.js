@@ -27,7 +27,7 @@ const createUnixSocketPool = require('./unix-socket');
 
 //Firebase Admin initialization
 const admin = require('firebase-admin');
-const { memoryStorage } = require('multer');
+const { memoryStorage, diskStorage } = require('multer');
 admin.initializeApp({
   credential: admin.credential.applicationDefault(),
   databaseURL: 'https://capstone-project-c22-ps362-default-rtdb.asia-southeast1.firebasedatabase.app/'
@@ -36,11 +36,27 @@ admin.initializeApp({
 const PORT = process.env.PORT || 8080;
 
 //Multer initialization (for file handling)
+//upload handles file upload to GCS
 const upload = multer({
-  //storage: multer.memoryStorage(), disabled for testing using /tmp as storage
+  storage: multer.memoryStorage(),
+  limits:{
+    fileSize: 5*1024*1024,
+  },
+  fileFilter: function (req,file, callback){
+    var ext = path.extname(file.originalname);
+    if(ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg'){
+      return callback(new Error('Only images are allowed.'));
+    }
+    callback(null, true);
+  },
+});
+const tempStore = multer({
   storage: multer.diskStorage({
     destination: function(req, file, callback){
       callback(null, path.join('/tmp/uploads'));
+    },
+    filename: function(req, file, callback){
+      callback(null, 'PRED' + '-' + req.query.patientid + '-' + Date.now() + '.' + req.file.originalname.split('.')[req.file.originalname.split('.').length - 1])
     }
   }),
   limits:{
@@ -54,6 +70,11 @@ const upload = multer({
     callback(null, true);
   },
 });
+
+function fileUpload(req, res, next){
+  upload.single('file')(req, res, next);
+  tempStore.single('file')(req, res, next);
+}
 
 //Files container (GCS bucket) - Disabled for endpoint test 11-06-2022
 const storage = new Storage();
@@ -224,7 +245,7 @@ web.get('/predictionlist', async (req, res) => {
   }
 });
 
-web.post('/predict', upload.single('file'), (req, res, next) => {
+web.post('/predict', fileUpload, (req, res, next) => {
   if(!req.file){
     res.status(400).send('No image uploaded.').end();
   }
