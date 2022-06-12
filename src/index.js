@@ -281,7 +281,7 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
   });*/
   
   //Piping to ML backend
-  const newurl = 'https://getpredict-d34xsyfyta-as.a.run.app';
+  const newurl = 'https://prediction-d34xsyfyta-as.a.run.app';
   let data = {
     image: {file: `./uploads/${req.file.filename}`, content_type: 'image/png'}
   };
