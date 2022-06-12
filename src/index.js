@@ -10,6 +10,7 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const request = require('request');
+const streamifier = require('streamifier');
 const {format} = require('util');
 web.use(cors());
 
@@ -255,8 +256,6 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
   if(!req.query.patientid){
     res.status(400).send('No patient ID provideed.').end();
   }
-  //Piping to ML backend
-  const newurl = 'https://getpredict-d34xsyfyta-as.a.run.app';
   //Storing file to cloud storage
   const fileName = 'PRED' + '-' + req.query.patientid + '-' + Date.now() + '.' + req.file.originalname.split('.')[req.file.originalname.split('.').length - 1];
   const blob = bucket.file(fileName);
@@ -270,6 +269,12 @@ web.post('/predict', upload.single('file'), (req, res, next) => {
     res.status(200).send(publicUrl + ' ' + 'Upload Success.');
   });
 
+  //Streamify buffer to file for ML backend
+  const writeStream = fs.createWriteStream(`/tmp/${fileName}`);
+  streamifier.createReadStream(req.file.buffer).pipe(writeStream);
+  //Piping to ML backend
+  const newurl = 'https://getpredict-d34xsyfyta-as.a.run.app';
+  
   blobStream.end(req.file.buffer);
 
 });

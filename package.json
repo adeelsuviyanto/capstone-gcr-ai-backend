@@ -24,6 +24,7 @@
     "path": "^0.12.7",
     "promise-mysql": "^5.2.0",
     "request": "^2.88.2",
+    "streamifier": "^0.1.1",
     "tmp": "^0.2.1",
     "util": "^0.12.4"
   }
