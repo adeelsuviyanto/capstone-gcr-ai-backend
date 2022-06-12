@@ -54,10 +54,11 @@ const tempStore = multer({
   storage: multer.diskStorage({
     destination: function(req, file, callback){
       callback(null, path.join('/tmp/uploads'));
+      console.log(file.filename);
     },
-    filename: function(req, file, callback){
+    /*filename: function(req, file, callback){
       callback(null, 'PRED' + '-' + req.query.patientid + '-' + Date.now() + '.' + req.file.originalname.split('.')[req.file.originalname.split('.').length - 1])
-    }
+    }*/
   }),
   limits:{
     fileSize: 5*1024*1024,
